@@ -165,67 +165,57 @@
                 <button id="statisticsButton">統計情報表示</button>
                 <div id="ratingStatistics"></div>
             </div>
-            <p><a href="/create">レビューを追加</a></p>
-        </div>
-        <script type="text/javascript">
-            let personas = [];
-            personas = JSON.parse(decodeURIComponent('<%- encodeURIComponent(JSON.stringify(personas)) %>'));
+            <script type="text/javascript">
+                let personas = [];
+                personas = JSON.parse(decodeURIComponent('<%- encodeURIComponent(JSON.stringify(personas)) %>'));
+                console.log(personas);
 
-            console.log(personas)
-
-            function convertStarsToNumber(stars) {
-                const starCount = (stars.match(/★/g) || []).length;
-                const halfStarCount = (stars.match(/☆/g) || []).length;
-
-                return starCount - halfStarCount;
-            }
-
-            const sortSelect = document.getElementById('sortSelect');
-            sortSelect.addEventListener('change', sortData);
-
-            function sortData() {
-                console.log('テスト');
-                const sortDirection = sortSelect.value;
-                const rows = Array.from(document.querySelectorAll('.persona-row'));
-
-                console.log("ソート前のデータ: ");
-                rows.forEach((row) => {
-                    const personaId = row.dataset.personaId;
-                    const persona = personas.find((p) => p.id === personaId);
-                    console.log(`ID: ${persona.id}, 評価: ${persona.rating}`);
-                });
-
-                rows.sort((a, b) => {
-                    const personaIdA = a.dataset.personaId;
-                    const personaIdB = b.dataset.personaId;
-                    const personaA = personas.find((p) => p.id === personaIdA);
-                    const personaB = personas.find((p) => p.id === personaIdB);
-                    const ratingA = convertStarsToNumber(personaA.rating);
-                    const ratingB = convertStarsToNumber(personaB.rating);
-
-                    if (sortDirection === 'asc') {
-                        return ratingA - ratingB;
-                    } else {
-                        return ratingB - ratingA;
+                function convertStarsToNumber(stars) {
+                    if (!stars) {
+                        return 0;
                     }
-                });
+                    let starCount = stars.match(/★/g);
+                    return starCount ? starCount.length : 0;
+                }
 
-                console.log("ソート後のデータ: ");
-                rows.forEach((row) => {
-                    const personaId = row.dataset.personaId;
-                    const persona = personas.find((p) => p.id === personaId);
-                    console.log(`ID: ${persona.id}, 評価: ${persona.rating}`);
-                });
+                const sortSelect = document.getElementById('sortSelect');
+                sortSelect.addEventListener('change', sortData);
 
-                const tbody = document.querySelector('tbody');
-                tbody.innerHTML = '';
+                function sortData() {
+                    const sortDirection = sortSelect.value;
+                    const rows = Array.from(document.querySelectorAll('.persona-row'));
 
-                rows.forEach((row) => {
-                    tbody.appendChild(row);
-                });
-            }
+                    rows.sort((a, b) => {
+                        const personaIdA = a.dataset.personaId;
+                        const personaIdB = b.dataset.personaId;
+                        const personaA = personas.find((p) => p.id.toString() === personaIdA.toString());
+                        const personaB = personas.find((p) => p.id.toString() === personaIdB.toString());
+                        const ratingA = convertStarsToNumber(personaA ? personaA.rating : null);
+                        const ratingB = convertStarsToNumber(personaB ? personaB.rating : null);
 
+                        console.log('personaA:', personaA);
+                        console.log('personaB:', personaB);
+                        console.log('ratingA:', ratingA);
+                        console.log('ratingB:', ratingB);
 
-        </script>
+                        if (typeof ratingA !== 'undefined' && typeof ratingB !== 'undefined') {
+                            if (sortDirection === 'asc') {
+                                return ratingA - ratingB;
+                            } else {
+                                return ratingB - ratingA;
+                            }
+                        } else {
+                            return 0;
+                        }
+                    });
+
+                    const tbody = document.querySelector('tbody');
+                    tbody.innerHTML = '';
+
+                    rows.forEach((row) => {
+                        tbody.appendChild(row);
+                    });
+                }
+            </script>
     </body>
 </html>
