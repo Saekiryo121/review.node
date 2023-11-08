@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+ ユーザー情報の追加機能実装
+    <head>
+        <meta charset="UTF-8">
+        <title>入力フォーム</title>
+    </head>
+    <body>
+        <h1>入力フォーム</h1>
+        <!--ここに追加-->
+        <form action="/" method="POST">
+            <label for="name">name:</label>
+            <input type="text" id="name" name="name" placeholder="名前を入力してください" required><br><br>
+            <p id="warn"></p>
+            <label for="email">email:</label>
+            <input type="email" id="email" name="email" placeholder="Eメールを入力してください" required><br><br>
+            <p id="warn1"></p>
+            <button type="submit" id="submit">送信</button>
+        </form>
+        <script>
+            function check() {
+                let warn = document.getElementById('warn')
+                let name = document.getElementById('name').value;
+                if (!name.match(/^[A-Za-z.]+$/)) {
+                    warn.innerHTML = '半角英語・「.」のみ入力してください';
+                } else {
+                    check01.innerHTML = '';
+                }
+
+                let warn1 = document.getElementById('warn1')
+                let email = document.getElementById('email').value;
+                if (!name.match(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)) {
+                    warn1.innerHTML = 'メールアドレスを入力してください';
+                } else {
+                    check01.innerHTML = '';
+                }
+            }
+
+
+            let submit = document.getElementById('submit')
+            submit.addEventListener('click', check);
+        </script>
+    </body>
+    
+</html>
