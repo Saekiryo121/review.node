@@ -2,7 +2,7 @@
 <html lang="ja">
     <head>
         <meta charset="UTF-8">
-        <title>Review Page</title>
+        <title>Reviews</title>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -10,7 +10,7 @@
             }
 
             #container {
-                max-width: 800px;
+                max-width: 1000px;
                 margin: 0 auto;
                 padding: 20px;
                 background-color: #fff;
@@ -19,6 +19,7 @@
 
             h1 {
                 text-align: center;
+                color: #0070c9;
             }
 
             table {
@@ -57,6 +58,7 @@
                 width: 70%;
                 font-size: 16px;
                 border: 1px solid #ccc;
+                margin-left: 70px;
             }
 
             #clickButton {
@@ -90,21 +92,54 @@
                 text-align: center;
                 margin-top: 20px;
             }
+
+            .filter-container {
+                text-align: center;
+                margin-top: 20px;
+            }
+
+            #filteredTextBox {
+                padding: 5px;
+                width: 40%;
+                font-size: 16px;
+                border: 1px solid #ccc;
+            }
+
+            #sortSelect {
+                font-size: 16px;
+                margin-left: 10px;
+            }
+
+            #clickButton {
+                padding: 5px 15px;
+                background-color: #0070c9;
+                color: #fff;
+                border: none;
+                cursor: pointer;
+                font-size: 12px;
+                margin-left: 10px;
+            }
         </style>
     </head>
     <body>
         <div id="container">
-            <h1>User List</h1>
+            <h1>Reviews</h1>
+            <div class="filter-container">
+                <label for="sortSelect">評価でソート:</label>
+                <select id="sortSelect">
+                    <option value="asc">低い順</option>
+                    <option value="desc">高い順</option>
+                </select>
+                <input type="text" id="filteredTextBox" placeholder="名前で絞り込み">
+                <button id="clickButton">絞り込み</button>
+            </div>
             <table>
                 <thead>
                     <tr>
-                        <th>名前</th>
-                        <th>Email</th>
-                        <th>読み仮名</th>
-                        <th>性別</th>
-                        <th>電話番号</th>
-                        <th>仕事場</th>
-                        <th>世帯数</th>
+                        <th>ユーザー</th>
+                        <th>年齢</th>
+                        <th>評価</th>
+                        <th>レビュー</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -114,55 +149,83 @@
                                 <%= persona.name %>
                             </td>
                             <td>
-                                <%= persona.email %>
+                                <%= persona.age %>歳
                             </td>
                             <td>
-                                <%= persona.kana_name %>
+                                <%= persona.rating %>
                             </td>
                             <td>
-                                <%= persona.gender %>
-                            </td>
-                            <td>
-                                <%= persona.phone %>
-                            </td>
-                            <td>
-                                <%= persona.workplace %>
-                            </td>
-                            <td>
-                                <%= persona.household %>
+                                <%= persona.review %>
                             </td>
                         </tr>
                         <% }); %>
                 </tbody>
             </table>
-            <div class="filter-container">
-                <input type="text" id="filteredTextBox" placeholder="名前で絞り込み">
-                <button id="clickButton">絞り込み</button>
-            </div>
             <div id="statistics">
                 <button id="statisticsButton">統計情報表示</button>
-                <div id="genderStatistics"></div>
-                <div id="workplaceStatistics"></div>
-                <div id="householdStatistics"></div>
+                <div id="ratingStatistics"></div>
             </div>
-            <p><a href="/create">ユーザーの追加</a></p>
+            <p><a href="/create">レビューを追加</a></p>
         </div>
         <script type="text/javascript">
-            let personas = JSON.parse('<%= JSON.stringify(personas) %>'.replace(/&#34;/g, '"'));
+            let personas = [];
+            personas = JSON.parse(decodeURIComponent('<%- encodeURIComponent(JSON.stringify(personas)) %>'));
 
-            let clickButton = document.getElementById('clickButton');
-            clickButton.addEventListener('click', filterData);
+            console.log(personas)
 
-            const selectButtons = document.querySelectorAll('.select-button');
-            selectButtons.forEach((button) => {
-                button.addEventListener('click', function () {
-                    let personaId = button.getAttribute('data-persona-id');
-                    selectPersona(personaId);
+            function convertStarsToNumber(stars) {
+                const starCount = (stars.match(/★/g) || []).length;
+                const halfStarCount = (stars.match(/☆/g) || []).length;
+
+                return starCount - halfStarCount;
+            }
+
+            const sortSelect = document.getElementById('sortSelect');
+            sortSelect.addEventListener('change', sortData);
+
+            function sortData() {
+                console.log('テスト');
+                const sortDirection = sortSelect.value;
+                const rows = Array.from(document.querySelectorAll('.persona-row'));
+
+                console.log("ソート前のデータ: ");
+                rows.forEach((row) => {
+                    const personaId = row.dataset.personaId;
+                    const persona = personas.find((p) => p.id === personaId);
+                    console.log(`ID: ${persona.id}, 評価: ${persona.rating}`);
                 });
-            });
 
-            let statisticsButton = document.getElementById('statisticsButton');
-            statisticsButton.addEventListener('click', showStatistics);
+                rows.sort((a, b) => {
+                    const personaIdA = a.dataset.personaId;
+                    const personaIdB = b.dataset.personaId;
+                    const personaA = personas.find((p) => p.id === personaIdA);
+                    const personaB = personas.find((p) => p.id === personaIdB);
+                    const ratingA = convertStarsToNumber(personaA.rating);
+                    const ratingB = convertStarsToNumber(personaB.rating);
+
+                    if (sortDirection === 'asc') {
+                        return ratingA - ratingB;
+                    } else {
+                        return ratingB - ratingA;
+                    }
+                });
+
+                console.log("ソート後のデータ: ");
+                rows.forEach((row) => {
+                    const personaId = row.dataset.personaId;
+                    const persona = personas.find((p) => p.id === personaId);
+                    console.log(`ID: ${persona.id}, 評価: ${persona.rating}`);
+                });
+
+                const tbody = document.querySelector('tbody');
+                tbody.innerHTML = '';
+
+                rows.forEach((row) => {
+                    tbody.appendChild(row);
+                });
+            }
+
+
         </script>
     </body>
 </html>
