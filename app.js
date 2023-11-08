@@ -17,8 +17,6 @@ const con = mysql.createConnection({
   database: "express_db",
 });
 
-
-// mysqlからデータを持ってくる
 app.get("/", (req, res) => {
   const sql = "select * from personas";
 
