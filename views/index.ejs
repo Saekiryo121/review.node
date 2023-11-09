@@ -1,168 +1,161 @@
 <!DOCTYPE html>
 <html lang="ja">
-    <head>
-        <meta charset="UTF-8">
-        <title>Review Page</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                background-color: #f7f7f7;
+<head>
+    <meta charset="UTF-8">
+    <title>Reviews</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+        }
+
+        #container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #0070c9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th,
+        td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 10px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        a {
+            text-decoration: none;
+            color: #0070c9;
+        }
+
+        .filter-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #sortSelect, #ratingFilter {
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        #clickButton {
+            padding: 5px 15px;
+            background-color: #0070c9;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+    <h1>Reviews</h1>
+    <div class="filter-container">
+        <label for="sortSelect">評価でソート:</label>
+        <select id="sortSelect">
+            <option value="asc">低い順</option>
+            <option value="desc">高い順</option>
+        </select>
+    </div>
+    <table>
+        <thead>
+        <tr>
+            <th>ユーザー</th>
+            <th>年齢</th>
+            <th>評価</th>
+            <th>レビュー</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% personas.forEach(function(persona) { %>
+        <tr class="persona-row" data-persona-id="<%= persona.id %>" data-rating="<%= persona.rating %>">
+            <td>
+                <%= persona.name %>
+            </td>
+            <td>
+                <%= persona.age %>歳
+            </td>
+            <td>
+                <%= persona.rating %>
+            </td>
+            <td>
+                <%= persona.review %>
+            </td>
+        </tr>
+        <% }); %>
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    let personas = [];
+    personas = JSON.parse(decodeURIComponent('<%- encodeURIComponent(JSON.stringify(personas)) %>'));
+    console.log(personas);
+
+    function convertStarsToNumber(stars) {
+        if (!stars) {
+            return 0;
+        }
+        let starCount = stars.match(/★/g);
+        return starCount ? starCount.length : 0;
+    }
+
+    const sortSelect = document.getElementById('sortSelect');
+    sortSelect.addEventListener('change', sortData);
+
+    function sortData() {
+        const sortDirection = sortSelect.value;
+        const rows = Array.from(document.querySelectorAll('.persona-row'));
+
+        console.log('Sort Direction:', sortDirection);
+
+        rows.sort((a, b) => {
+            const ratingA = convertStarsToNumber(a.getAttribute('data-rating'));
+            const ratingB = convertStarsToNumber(b.getAttribute('data-rating'));
+
+            console.log('Rating A:', ratingA);
+            console.log('Rating B:', ratingB);
+
+            if (typeof ratingA !== 'undefined' && typeof ratingB !== 'undefined') {
+                if (sortDirection === 'asc') {
+                    return ratingA - ratingB;
+                } else {
+                    return ratingB - ratingA;
+                }
+            } else {
+                return 0;
             }
+        });
 
-            #container {
-                max-width: 800px;
-                margin: 0 auto;
-                padding: 20px;
-                background-color: #fff;
-                box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-            }
+        const tbody = document.querySelector('tbody');
+        tbody.innerHTML = '';
 
-            h1 {
-                text-align: center;
-            }
+        rows.forEach((row) => {
+            tbody.appendChild(row);
+        });
 
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin: 20px 0;
-            }
-
-            th,
-            td {
-                border: 1px solid #dddddd;
-                text-align: left;
-                padding: 10px;
-            }
-
-            th {
-                background-color: #f2f2f2;
-            }
-
-            tr:nth-child(even) {
-                background-color: #f9f9f9;
-            }
-
-            a {
-                text-decoration: none;
-                color: #0070c9;
-            }
-
-            .filter-container {
-                text-align: center;
-                margin-top: 20px;
-            }
-
-            #filteredTextBox {
-                padding: 5px;
-                width: 70%;
-                font-size: 16px;
-                border: 1px solid #ccc;
-            }
-
-            #clickButton {
-                padding: 10px 20px;
-                background-color: #0070c9;
-                color: #fff;
-                border: none;
-                cursor: pointer;
-                font-size: 16px;
-            }
-
-            #clickButton:hover {
-                background-color: #00588A;
-            }
-
-            #statisticsButton {
-                padding: 10px 20px;
-                background-color: #0070c9;
-                color: #fff;
-                border: none;
-                cursor: pointer;
-                font-size: 16px;
-                margin-top: 20px;
-            }
-
-            #statisticsButton:hover {
-                background-color: #00588A;
-            }
-
-            #statistics {
-                text-align: center;
-                margin-top: 20px;
-            }
-        </style>
-    </head>
-    <body>
-        <div id="container">
-            <h1>User List</h1>
-            <table>
-                <thead>
-                    <tr>
-                        <th>名前</th>
-                        <th>Email</th>
-                        <th>読み仮名</th>
-                        <th>性別</th>
-                        <th>電話番号</th>
-                        <th>仕事場</th>
-                        <th>世帯数</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% personas.forEach(function(persona) { %>
-                        <tr class="persona-row" data-persona-id="<%= persona.id %>">
-                            <td>
-                                <%= persona.name %>
-                            </td>
-                            <td>
-                                <%= persona.email %>
-                            </td>
-                            <td>
-                                <%= persona.kana_name %>
-                            </td>
-                            <td>
-                                <%= persona.gender %>
-                            </td>
-                            <td>
-                                <%= persona.phone %>
-                            </td>
-                            <td>
-                                <%= persona.workplace %>
-                            </td>
-                            <td>
-                                <%= persona.household %>
-                            </td>
-                        </tr>
-                        <% }); %>
-                </tbody>
-            </table>
-            <div class="filter-container">
-                <input type="text" id="filteredTextBox" placeholder="名前で絞り込み">
-                <button id="clickButton">絞り込み</button>
-            </div>
-            <div id="statistics">
-                <button id="statisticsButton">統計情報表示</button>
-                <div id="genderStatistics"></div>
-                <div id="workplaceStatistics"></div>
-                <div id="householdStatistics"></div>
-            </div>
-            <p><a href="/create">ユーザーの追加</a></p>
-        </div>
-        <script type="text/javascript">
-            let personas = JSON.parse('<%= JSON.stringify(personas) %>'.replace(/&#34;/g, '"'));
-
-            let clickButton = document.getElementById('clickButton');
-            clickButton.addEventListener('click', filterData);
-
-            const selectButtons = document.querySelectorAll('.select-button');
-            selectButtons.forEach((button) => {
-                button.addEventListener('click', function () {
-                    let personaId = button.getAttribute('data-persona-id');
-                    selectPersona(personaId);
-                });
-            });
-
-            let statisticsButton = document.getElementById('statisticsButton');
-            statisticsButton.addEventListener('click', showStatistics);
-        </script>
-    </body>
+    }
+</script>
+</body>
 </html>

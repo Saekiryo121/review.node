@@ -18,28 +18,35 @@ const con = mysql.createConnection({
 });
 
 app.get("/", (req, res) => {
-  const sql = "select * from personas";
-
-  app.post("/", (req, res) => {
-    const sql = "INSERT INTO personas SET ?";
-    con.query(sql, req.body, function (err, result, fields) {
-      if (err) throw err;
-      console.log(result);
-      res.redirect("/");
-    });
-  });
-
-  app.get("/create", (req, res) => {
-    res.sendFile(path.join(__dirname, "html/form.html"));
-  });
-
+  const sql = "SELECT * FROM personas";
   con.query(sql, function (err, result, fields) {
     if (err) throw err;
+    const personas = result;
     res.render("index", {
-      personas: result
+      personas: personas
     });
   });
 });
 
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.post("/add-review", (req, res) => {
+  const newReview = {
+    name: req.body.name,
+    email: req.body.email,
+    kana_name: req.body.kana_name,
+    gender: req.body.gender,
+    phone: req.body.phone,
+    workplace: req.body.workplace,
+    household: req.body.household,
+  };
+
+  const sql = "INSERT INTO personas SET ?";
+  con.query(sql, newReview, function (err, result) {
+    if (err) throw err;
+    console.log("New review added:", newReview);
+    res.redirect("/");
+  });
+});
+
+
+app.listen(port, () => console.log(`App listening on port ${port}`));
