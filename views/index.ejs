@@ -1,221 +1,161 @@
 <!DOCTYPE html>
 <html lang="ja">
-    <head>
-        <meta charset="UTF-8">
-        <title>Reviews</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                background-color: #f7f7f7;
-            }
+<head>
+    <meta charset="UTF-8">
+    <title>Reviews</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+        }
 
-            #container {
-                max-width: 1000px;
-                margin: 0 auto;
-                padding: 20px;
-                background-color: #fff;
-                box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-            }
+        #container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
 
-            h1 {
-                text-align: center;
-                color: #0070c9;
-            }
+        h1 {
+            text-align: center;
+            color: #0070c9;
+        }
 
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin: 20px 0;
-            }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
 
-            th,
-            td {
-                border: 1px solid #dddddd;
-                text-align: left;
-                padding: 10px;
-            }
+        th,
+        td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 10px;
+        }
 
-            th {
-                background-color: #f2f2f2;
-            }
+        th {
+            background-color: #f2f2f2;
+        }
 
-            tr:nth-child(even) {
-                background-color: #f9f9f9;
-            }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
 
-            a {
-                text-decoration: none;
-                color: #0070c9;
-            }
+        a {
+            text-decoration: none;
+            color: #0070c9;
+        }
 
-            .filter-container {
-                text-align: center;
-                margin-top: 20px;
-            }
+        .filter-container {
+            text-align: center;
+            margin-top: 20px;
+        }
 
-            #filteredTextBox {
-                padding: 5px;
-                width: 70%;
-                font-size: 16px;
-                border: 1px solid #ccc;
-                margin-left: 70px;
-            }
+        #sortSelect, #ratingFilter {
+            font-size: 16px;
+            margin-left: 10px;
+        }
 
-            #clickButton {
-                padding: 10px 20px;
-                background-color: #0070c9;
-                color: #fff;
-                border: none;
-                cursor: pointer;
-                font-size: 16px;
-            }
+        #clickButton {
+            padding: 5px 15px;
+            background-color: #0070c9;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+    <h1>Reviews</h1>
+    <div class="filter-container">
+        <label for="sortSelect">評価でソート:</label>
+        <select id="sortSelect">
+            <option value="asc">低い順</option>
+            <option value="desc">高い順</option>
+        </select>
+    </div>
+    <table>
+        <thead>
+        <tr>
+            <th>ユーザー</th>
+            <th>年齢</th>
+            <th>評価</th>
+            <th>レビュー</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% personas.forEach(function(persona) { %>
+        <tr class="persona-row" data-persona-id="<%= persona.id %>" data-rating="<%= persona.rating %>">
+            <td>
+                <%= persona.name %>
+            </td>
+            <td>
+                <%= persona.age %>歳
+            </td>
+            <td>
+                <%= persona.rating %>
+            </td>
+            <td>
+                <%= persona.review %>
+            </td>
+        </tr>
+        <% }); %>
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    let personas = [];
+    personas = JSON.parse(decodeURIComponent('<%- encodeURIComponent(JSON.stringify(personas)) %>'));
+    console.log(personas);
 
-            #clickButton:hover {
-                background-color: #00588A;
-            }
+    function convertStarsToNumber(stars) {
+        if (!stars) {
+            return 0;
+        }
+        let starCount = stars.match(/★/g);
+        return starCount ? starCount.length : 0;
+    }
 
-            #statisticsButton {
-                padding: 10px 20px;
-                background-color: #0070c9;
-                color: #fff;
-                border: none;
-                cursor: pointer;
-                font-size: 16px;
-                margin-top: 20px;
-            }
+    const sortSelect = document.getElementById('sortSelect');
+    sortSelect.addEventListener('change', sortData);
 
-            #statisticsButton:hover {
-                background-color: #00588A;
-            }
+    function sortData() {
+        const sortDirection = sortSelect.value;
+        const rows = Array.from(document.querySelectorAll('.persona-row'));
 
-            #statistics {
-                text-align: center;
-                margin-top: 20px;
-            }
+        console.log('Sort Direction:', sortDirection);
 
-            .filter-container {
-                text-align: center;
-                margin-top: 20px;
-            }
+        rows.sort((a, b) => {
+            const ratingA = convertStarsToNumber(a.getAttribute('data-rating'));
+            const ratingB = convertStarsToNumber(b.getAttribute('data-rating'));
 
-            #filteredTextBox {
-                padding: 5px;
-                width: 40%;
-                font-size: 16px;
-                border: 1px solid #ccc;
-            }
+            console.log('Rating A:', ratingA);
+            console.log('Rating B:', ratingB);
 
-            #sortSelect {
-                font-size: 16px;
-                margin-left: 10px;
-            }
-
-            #clickButton {
-                padding: 5px 15px;
-                background-color: #0070c9;
-                color: #fff;
-                border: none;
-                cursor: pointer;
-                font-size: 12px;
-                margin-left: 10px;
-            }
-        </style>
-    </head>
-    <body>
-        <div id="container">
-            <h1>Reviews</h1>
-            <div class="filter-container">
-                <label for="sortSelect">評価でソート:</label>
-                <select id="sortSelect">
-                    <option value="asc">低い順</option>
-                    <option value="desc">高い順</option>
-                </select>
-                <input type="text" id="filteredTextBox" placeholder="名前で絞り込み">
-                <button id="clickButton">絞り込み</button>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ユーザー</th>
-                        <th>年齢</th>
-                        <th>評価</th>
-                        <th>レビュー</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% personas.forEach(function(persona) { %>
-                        <tr class="persona-row" data-persona-id="<%= persona.id %>">
-                            <td>
-                                <%= persona.name %>
-                            </td>
-                            <td>
-                                <%= persona.age %>歳
-                            </td>
-                            <td>
-                                <%= persona.rating %>
-                            </td>
-                            <td>
-                                <%= persona.review %>
-                            </td>
-                        </tr>
-                        <% }); %>
-                </tbody>
-            </table>
-            <div id="statistics">
-                <button id="statisticsButton">統計情報表示</button>
-                <div id="ratingStatistics"></div>
-            </div>
-            <script type="text/javascript">
-                let personas = [];
-                personas = JSON.parse(decodeURIComponent('<%- encodeURIComponent(JSON.stringify(personas)) %>'));
-                console.log(personas);
-
-                function convertStarsToNumber(stars) {
-                    if (!stars) {
-                        return 0;
-                    }
-                    let starCount = stars.match(/★/g);
-                    return starCount ? starCount.length : 0;
+            if (typeof ratingA !== 'undefined' && typeof ratingB !== 'undefined') {
+                if (sortDirection === 'asc') {
+                    return ratingA - ratingB;
+                } else {
+                    return ratingB - ratingA;
                 }
+            } else {
+                return 0;
+            }
+        });
 
-                const sortSelect = document.getElementById('sortSelect');
-                sortSelect.addEventListener('change', sortData);
+        const tbody = document.querySelector('tbody');
+        tbody.innerHTML = '';
 
-                function sortData() {
-                    const sortDirection = sortSelect.value;
-                    const rows = Array.from(document.querySelectorAll('.persona-row'));
+        rows.forEach((row) => {
+            tbody.appendChild(row);
+        });
 
-                    rows.sort((a, b) => {
-                        const personaIdA = a.dataset.personaId;
-                        const personaIdB = b.dataset.personaId;
-                        const personaA = personas.find((p) => p.id.toString() === personaIdA.toString());
-                        const personaB = personas.find((p) => p.id.toString() === personaIdB.toString());
-                        const ratingA = convertStarsToNumber(personaA ? personaA.rating : null);
-                        const ratingB = convertStarsToNumber(personaB ? personaB.rating : null);
-
-                        console.log('personaA:', personaA);
-                        console.log('personaB:', personaB);
-                        console.log('ratingA:', ratingA);
-                        console.log('ratingB:', ratingB);
-
-                        if (typeof ratingA !== 'undefined' && typeof ratingB !== 'undefined') {
-                            if (sortDirection === 'asc') {
-                                return ratingA - ratingB;
-                            } else {
-                                return ratingB - ratingA;
-                            }
-                        } else {
-                            return 0;
-                        }
-                    });
-
-                    const tbody = document.querySelector('tbody');
-                    tbody.innerHTML = '';
-
-                    rows.forEach((row) => {
-                        tbody.appendChild(row);
-                    });
-                }
-            </script>
-    </body>
+    }
+</script>
+</body>
 </html>
