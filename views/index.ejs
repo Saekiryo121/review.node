@@ -1,188 +1,239 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>Reviews</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f7f7f7;
-        }
+    <head>
+        <meta charset="UTF-8">
+        <title>Reviews</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f7f7f7;
+            }
 
-        #container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-        }
+            #container {
+                max-width: 1000px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #fff;
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            }
 
-        h1 {
-            text-align: center;
-            color: #0070c9;
-        }
+            h1 {
+                text-align: center;
+                color: #0070c9;
+            }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+            }
 
-        th,
-        td {
-            border: 1px solid #dddddd;
-            text-align: left;
-            padding: 10px;
-        }
+            th,
+            td {
+                border: 1px solid #dddddd;
+                text-align: left;
+                padding: 10px;
+            }
 
-        th {
-            background-color: #f2f2f2;
-        }
+            th {
+                background-color: #f2f2f2;
+            }
 
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
+            tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
 
-        a {
-            text-decoration: none;
-            color: #0070c9;
-        }
+            a {
+                text-decoration: none;
+                color: #0070c9;
+            }
 
-        .filter-container {
-            text-align: center;
-            margin-top: 20px;
-        }
+            .filter-container {
+                text-align: center;
+                margin-top: 20px;
+            }
 
-        #sortSelect, #ratingFilter {
-            font-size: 16px;
-            margin-left: 10px;
-        }
+            #sortSelect,
+            #ratingFilter {
+                font-size: 16px;
+                margin-left: 10px;
+            }
 
-        #clickButton {
-            padding: 5px 15px;
-            background-color: #0070c9;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            font-size: 12px;
-            margin-left: 10px;
-        }
-    </style>
-</head>
-<body>
-<div id="container">
-    <h1>Reviews</h1>
-    <div class="filter-container">
-        <label for="sortSelect">評価でソート:</label>
-        <select id="sortSelect">
-            <option value="asc">低い順</option>
-            <option value="desc">高い順</option>
-        </select>
-        <label for="ratingFilter">評価で絞り込み:</label>
-        <select id="ratingFilter">
-            <option value="all">すべて</option>
-            <option value="1">★</option>
-            <option value="2">★★</option>
-            <option value="3">★★★</option>
-            <option value="4">★★★★</option>
-            <option value="5">★★★★★</option>
-        </select>
-    </div>
-    <table>
-        <thead>
-        <tr>
-            <th>ユーザー</th>
-            <th>年齢</th>
-            <th>評価</th>
-            <th>レビュー</th>
-        </tr>
-        </thead>
-        <tbody>
-        <% personas.forEach(function(persona) { %>
-        <tr class="persona-row" data-persona-id="<%= persona.id %>" data-rating="<%= persona.rating %>">
-            <td>
-                <%= persona.name %>
-            </td>
-            <td>
-                <%= persona.age %>歳
-            </td>
-            <td>
-                <%= persona.rating %>
-            </td>
-            <td>
-                <%= persona.review %>
-            </td>
-        </tr>
-        <% }); %>
-        </tbody>
-    </table>
-    <div id="statistics">
-        <h2>年代別統計情報</h2>
-        <ul id="ageStatistics"></ul>
-    </div>
-</div>
-<script type="text/javascript">
-    let personas = [];
-    personas = JSON.parse(decodeURIComponent('<%- encodeURIComponent(JSON.stringify(personas)) %>'));
-    console.log(personas);
-    console.log('test')
+            #clickButton {
+                padding: 5px 15px;
+                background-color: #0070c9;
+                color: #fff;
+                border: none;
+                cursor: pointer;
+                font-size: 12px;
+                margin-left: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="container">
+            <h1>Reviews</h1>
+            <div class="filter-container">
+                <label for="sortSelect">評価でソート:</label>
+                <select id="sortSelect">
+                    <option value="asc">低い順</option>
+                    <option value="desc">高い順</option>
+                </select>
+                <label for="ratingFilter">評価で絞り込み:</label>
+                <select id="ratingFilter">
+                    <option value="all">すべて</option>
+                    <option value="1">★</option>
+                    <option value="2">★★</option>
+                    <option value="3">★★★</option>
+                    <option value="4">★★★★</option>
+                    <option value="5">★★★★★</option>
+                </select>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ユーザー</th>
+                        <th>年齢</th>
+                        <th>評価</th>
+                        <th>レビュー</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% personas.forEach(function(persona) { %>
+                        <tr class="persona-row" data-persona-id="<%= persona.id %>" data-rating="<%= persona.rating %>">
+                            <td>
+                                <%= persona.name %>
+                            </td>
+                            <td>
+                                <%= persona.age %>歳
+                            </td>
+                            <td>
+                                <%= persona.rating %>
+                            </td>
+                            <td>
+                                <%= persona.review %>
+                            </td>
+                        </tr>
+                        <% }); %>
+                </tbody>
+            </table>
+            <div id="statistics">
+                <h2>年代別統計情報</h2>
+                <ul id="ageStatistics"></ul>
+            </div>
+        </div>
+        <script type="text/javascript">
+            let personas = [];
+            personas = JSON.parse(decodeURIComponent('<%- encodeURIComponent(JSON.stringify(personas)) %>'));
+            console.log(personas);
 
-    function convertStarsToNumber(stars) {
-        if (!stars) {
-            return 0;
-        }
-        let starCount = stars.match(/★/g);
-        return starCount ? starCount.length : 0;
-    }
-
-    const sortSelect = document.getElementById('sortSelect');
-    sortSelect.addEventListener('change', sortData);
-
-    const ratingFilterSelect = document.getElementById('ratingFilter');
-    ratingFilterSelect.addEventListener('change', sortData);
-
-    function sortData() {
-        const sortDirection = sortSelect.value;
-        const ratingFilter = ratingFilterSelect.value;
-        const rows = Array.from(document.querySelectorAll('.persona-row'));
-
-        console.log('Sort Direction:', sortDirection);
-        console.log('Rating Filter:', ratingFilter);
-
-        rows.sort((a, b) => {
-            const ratingA = convertStarsToNumber(a.getAttribute('data-rating'));
-            const ratingB = convertStarsToNumber(b.getAttribute('data-rating'));
-
-            console.log('Rating A:', ratingA);
-            console.log('Rating B:', ratingB);
-
-            if (typeof ratingA !== 'undefined' && typeof ratingB !== 'undefined') {
-                if (sortDirection === 'asc') {
-                    return ratingA - ratingB;
-                } else {
-                    return ratingB - ratingA;
+            function convertStarsToNumber(stars) {
+                if (!stars) {
+                    return 0;
                 }
-            } else {
-                return 0;
+                let starCount = stars.match(/★/g);
+                return starCount ? starCount.length : 0;
             }
-        });
 
-        const tbody = document.querySelector('tbody');
-        tbody.innerHTML = '';
+            const sortSelect = document.getElementById('sortSelect');
+            sortSelect.addEventListener('change', sortData);
 
-        rows.forEach((row) => {
-            tbody.appendChild(row);
-        });
+            const ratingFilterSelect = document.getElementById('ratingFilter');
+            ratingFilterSelect.addEventListener('change', sortData);
 
-        rows.forEach((row) => {
-            const rowRating = convertStarsToNumber(row.getAttribute('data-rating'));
-            if (ratingFilter === 'all' || rowRating == ratingFilter) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
+            function sortData() {
+                const sortDirection = sortSelect.value;
+                const ratingFilter = ratingFilterSelect.value;
+                const rows = Array.from(document.querySelectorAll('.persona-row'));
+
+                console.log('Sort Direction:', sortDirection);
+                console.log('Rating Filter:', ratingFilter);
+
+                const ratingStatistics = {
+                    1: { '10代': 0, '20代': 0, '30代': 0, '40代': 0, '50代以上': 0 },
+                    2: { '10代': 0, '20代': 0, '30代': 0, '40代': 0, '50代以上': 0 },
+                    3: { '10代': 0, '20代': 0, '30代': 0, '40代': 0, '50代以上': 0 },
+                    4: { '10代': 0, '20代': 0, '30代': 0, '40代': 0, '50代以上': 0 },
+                    5: { '10代': 0, '20代': 0, '30代': 0, '40代': 0, '50代以上': 0 },
+                };
+
+                rows.sort((a, b) => {
+                    const ratingA = convertStarsToNumber(a.getAttribute('data-rating'));
+                    const ratingB = convertStarsToNumber(b.getAttribute('data-rating'));
+
+                    console.log('Rating A:', ratingA);
+                    console.log('Rating B:', ratingB);
+
+                    if (typeof ratingA !== 'undefined' && typeof ratingB !== 'undefined') {
+                        if (sortDirection === 'asc') {
+                            return ratingA - ratingB;
+                        } else {
+                            return ratingB - ratingA;
+                        }
+                    } else {
+                        return 0;
+                    }
+                });
+
+                const tbody = document.querySelector('tbody');
+                tbody.innerHTML = '';
+
+                rows.forEach((row) => {
+                    tbody.appendChild(row);
+                });
+
+                rows.forEach((row) => {
+                    const rowRating = convertStarsToNumber(row.getAttribute('data-rating'));
+                    const ageGroup = getAgeGroup(row);
+
+                    if ((ratingFilter === 'all' || rowRating == ratingFilter)) {
+                        ratingStatistics[rowRating][ageGroup]++;
+                    }
+
+                    if (ratingFilter === 'all' || rowRating == ratingFilter) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                updateStatistics(ratingStatistics, ratingFilter);
             }
-        });
-    }
-</script>
-</body>
+
+            function updateStatistics(ratingStatistics, currentFilter) {
+                const ageStatisticsList = document.getElementById('ageStatistics');
+                ageStatisticsList.innerHTML = '';
+
+                for (const [rating, ageGroups] of Object.entries(ratingStatistics)) {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `★${rating}: `;
+
+                    if (currentFilter === 'all' || rating == currentFilter) {
+                        for (const [ageGroup, count] of Object.entries(ageGroups)) {
+                            listItem.textContent += `${ageGroup}(${count}人) `;
+                        }
+                    }
+
+                    ageStatisticsList.appendChild(listItem);
+                }
+            }
+
+            function getAgeGroup(row) {
+                const ageText = row.querySelector('td:nth-child(2)').textContent;
+                const age = parseInt(ageText);
+
+                if (age >= 10 && age < 20) {
+                    return '10代';
+                } else if (age < 30) {
+                    return '20代';
+                } else if (age < 40) {
+                    return '30代';
+                } else if (age < 50) {
+                    return '40代';
+                } else {
+                    return '50代以上';
+                }
+            }
+        </script>
+    </body>
 </html>
