@@ -73,13 +73,33 @@
     <body>
         <div id="container">
             <h1>Reviews</h1>
+            <div id="form-container">
+                <h2>新しいレビューを追加</h2>
+                <form id="reviewForm">
+                    <label for="name">ユーザー名:</label>
+                    <input type="text" id="name" name="name" required>
+                    <label for="age">年齢:</label>
+                    <input type="number" id="age" name="age" required>
+                    <label for="rating">評価:</label>
+                    <select id="rating" name="rating" required>
+                        <option value="1">★</option>
+                        <option value="2">★★</option>
+                        <option value="3">★★★</option>
+                        <option value="4">★★★★</option>
+                        <option value="5">★★★★★</option>
+                    </select>
+                    <label for="review">レビュー内容:</label>
+                    <textarea id="review" name="review" required></textarea>
+                    <button type="button" onclick="addReview()">レビューを追加</button>
+                </form>
+            </div>
             <div class="filter-container">
-                <label for="sortSelect">評価でソート:</label>
+                <label for="sortSelect">評価:</label>
                 <select id="sortSelect">
                     <option value="asc">低い順</option>
                     <option value="desc">高い順</option>
                 </select>
-                <label for="ratingFilter">評価で絞り込み:</label>
+                <label for="ratingFilter">絞り込み:</label>
                 <select id="ratingFilter">
                     <option value="all">すべて</option>
                     <option value="1">★</option>
@@ -125,7 +145,6 @@
         <script type="text/javascript">
             let personas = [];
             personas = JSON.parse(decodeURIComponent('<%- encodeURIComponent(JSON.stringify(personas)) %>'));
-            console.log(personas);
 
             function convertStarsToNumber(stars) {
                 if (!stars) {
@@ -233,6 +252,44 @@
                 } else {
                     return '50代以上';
                 }
+            }
+
+            function addReview() {
+                const name = document.getElementById('name').value;
+                const age = document.getElementById('age').value;
+                const rating = document.getElementById('rating').value;
+                const review = document.getElementById('review').value;
+
+                console.log("Form data:", { name, age, rating, review });
+
+                if (!name || !age || !rating || !review) {
+                    alert('全ての項目を入力してください。');
+                    return;
+                }
+
+                const formData = {
+                    name: name,
+                    age: age,
+                    rating: rating,
+                    review: review
+                };
+
+                console.log("FormData:", formData);
+
+                fetch('/add-review', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
             }
         </script>
     </body>

@@ -7,6 +7,8 @@ const port = 3000;
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 const mysql = require("mysql2");
 
@@ -30,23 +32,34 @@ app.get("/", (req, res) => {
 
 
 app.post("/add-review", (req, res) => {
+  console.log("Received data:", req.body);
+
   const newReview = {
-    name: req.body.name,
-    email: req.body.email,
-    kana_name: req.body.kana_name,
-    gender: req.body.gender,
-    phone: req.body.phone,
-    workplace: req.body.workplace,
-    household: req.body.household,
+      name: req.body.name,
+      age: req.body.age,
+      rating: req.body.rating,
+      review: req.body.review
   };
 
-  const sql = "INSERT INTO personas SET ?";
-  con.query(sql, newReview, function (err, result) {
-    if (err) throw err;
-    console.log("New review added:", newReview);
-    res.redirect("/");
+  console.log("New review object:", newReview);
+
+  if (!newReview.name || !newReview.age || !newReview.rating || !newReview.review) {
+    console.error("Invalid form data. All fields are required.");
+    res.status(400).json({ error: "Invalid form data. All fields are required." });
+    return;
+}
+
+  const insertsql = "INSERT INTO personas SET ?";
+  con.query(insertsql, newReview, function (err, result) {
+      if (err) {
+          console.error("Error adding new review:", err);
+          res.status(500).json({ error: "Error adding new review" });
+          return;
+      }
+
+      console.log("New review added:", newReview);
+      res.status(200).json({ success: true });
   });
 });
-
 
 app.listen(port, () => console.log(`App listening on port ${port}`));
