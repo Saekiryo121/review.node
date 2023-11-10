@@ -146,6 +146,7 @@
             let personas = [];
             personas = JSON.parse(decodeURIComponent('<%- encodeURIComponent(JSON.stringify(personas)) %>'));
 
+            console.log('test')
             function convertStarsToNumber(stars) {
                 if (!stars) {
                     return 0;
