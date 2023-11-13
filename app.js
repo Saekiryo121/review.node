@@ -88,4 +88,22 @@ app.get("/get-review/:id", (req, res) => {
   });
 });
 
+app.post("/sort-reviews", (req, res) => {
+  const sortDirection = req.body.sort === "asc" ? "ASC" : "DESC";
+  console.log("Sort Direction:", sortDirection);
+
+  const sql = `SELECT * FROM personas ORDER BY rating ${sortDirection}`;
+  console.log("Executing SQL Query:", sql);
+
+  con.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      res.status(500).json({ error: "Internal Server Error" });
+    } else {
+      console.log("Sort success. MySQL data sorted.");
+      res.json(results);
+    }
+  });
+});
+
 app.listen(port, () => console.log(`App listening on port ${port}`));

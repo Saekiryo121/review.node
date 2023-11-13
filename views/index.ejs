@@ -129,6 +129,11 @@
                     <textarea id="review" name="review" required></textarea>
                     <button type="button" onclick="addReview()">レビューを追加</button>
                     <button type="button" onclick="updateReview()">レビューを更新</button>
+                    <select id="sortDirection">
+                        <option value="asc">昇順</option>
+                        <option value="desc">降順</option>
+                    </select>
+                    <button type="button" onclick="sqlReview()">追加</button>
                 </form>
             </div>
             <div class="filter-container">
@@ -166,7 +171,7 @@
                                 <%= persona.age %>歳
                             </td>
                             <td>
-                                <%= persona.rating %>
+                                <%= persona.rating %>点
                             </td>
                             <td>
                                 <%= persona.review %>
@@ -183,6 +188,8 @@
         <script type="text/javascript">
             let personas = [];
             personas = JSON.parse(decodeURIComponent('<%- encodeURIComponent(JSON.stringify(personas)) %>'));
+
+            console.log('test')
 
             function convertStarsToNumber(stars) {
                 if (!stars) {
@@ -363,6 +370,67 @@
 
             function convertNumberToStars(number) {
                 return '★'.repeat(number);
+            }
+
+            function updateTable(data) {
+                personas = data;
+                const tbody = document.querySelector('tbody');
+                tbody.innerHTML = '';
+
+                console.log('Updating table with data:', data);
+
+                personas.forEach(persona => {
+                    console.log('Persona:', persona);
+
+                    const tr = document.createElement('tr');
+                    tr.classList.add('persona-row');
+                    tr.setAttribute('data-persona-id', persona.id);
+                    tr.setAttribute('data-rating', persona.rating);
+
+                    const tdName = document.createElement('td');
+                    tdName.textContent = persona.name;
+                    tr.appendChild(tdName);
+
+                    const tdAge = document.createElement('td');
+                    tdAge.textContent = `${persona.age}歳`;
+                    tr.appendChild(tdAge);
+
+                    const tdRating = document.createElement('td');
+                    tdRating.textContent = `${persona.rating}点`;
+                    tr.appendChild(tdRating);
+
+                    const tdReview = document.createElement('td');
+                    tdReview.textContent = persona.review;
+                    tr.appendChild(tdReview);
+
+                    tbody.appendChild(tr);
+                });
+
+                console.log('Table updated successfully.');
+            }
+
+
+            let selectedMySqlSort = 'asc';
+
+            function sqlReview() {
+                const selectedSortDirection = document.getElementById('sortDirection').value;
+
+                fetch('/sort-reviews', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ sort: selectedSortDirection }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Sort success. MySQL data sorted.');
+                        console.log(data);
+                        updateTable(data);
+                    })
+                    .catch(error => {
+                        console.error('Error sorting data:', error);
+                    });
             }
 
         </script>
