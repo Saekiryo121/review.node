@@ -119,11 +119,11 @@
                     <input type="number" id="age" name="age" required>
                     <label for="rating">評価:</label>
                     <select id="rating" name="rating" required>
-                        <option value="1">★</option>
-                        <option value="2">★★</option>
-                        <option value="3">★★★</option>
-                        <option value="4">★★★★</option>
-                        <option value="5">★★★★★</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
                     </select>
                     <label for="review">レビュー内容:</label>
                     <textarea id="review" name="review" required></textarea>
@@ -133,7 +133,7 @@
                         <option value="asc">昇順</option>
                         <option value="desc">降順</option>
                     </select>
-                    <button type="button" onclick="sqlReview()">追加</button>
+                    <button type="button" onclick="sqlReview()">mySQLでのsort</button>
                 </form>
             </div>
             <div class="filter-container">
@@ -145,11 +145,11 @@
                 <label for="ratingFilter">絞り込み:</label>
                 <select id="ratingFilter">
                     <option value="all">すべて</option>
-                    <option value="1">★</option>
-                    <option value="2">★★</option>
-                    <option value="3">★★★</option>
-                    <option value="4">★★★★</option>
-                    <option value="5">★★★★★</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
                 </select>
             </div>
             <table>
@@ -192,11 +192,7 @@
             console.log('test')
 
             function convertStarsToNumber(stars) {
-                if (!stars) {
-                    return 0;
-                }
-                let starCount = stars.match(/★/g);
-                return starCount ? starCount.length : 0;
+                return parseInt(stars);
             }
 
             const sortSelect = document.getElementById('sortSelect');
@@ -367,10 +363,10 @@
                     });
             }
 
-
             function convertNumberToStars(number) {
                 return '★'.repeat(number);
             }
+
 
             function updateTable(data) {
                 personas = data;
