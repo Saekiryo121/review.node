@@ -7,11 +7,13 @@
             body {
                 font-family: Arial, sans-serif;
                 background-color: #f7f7f7;
+                margin: 0;
+                padding: 0;
             }
 
             #container {
                 max-width: 1000px;
-                margin: 0 auto;
+                margin: 20px auto;
                 padding: 20px;
                 background-color: #fff;
                 box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
@@ -22,17 +24,55 @@
                 color: #0070c9;
             }
 
+            form {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            label {
+                flex: 1 1 100%;
+                max-width: 100%;
+            }
+
+            input,
+            textarea {
+                width: 100%;
+                padding: 10px;
+                box-sizing: border-box;
+            }
+
+            select {
+                width: 100%;
+                padding: 8px;
+                box-sizing: border-box;
+                font-size: 14px;
+            }
+
+            button {
+                padding: 10px;
+                background-color: #0070c9;
+                color: #fff;
+                border: none;
+                cursor: pointer;
+                font-size: 14px;
+            }
+
+            button:hover {
+                background-color: #005689;
+            }
+
             table {
                 width: 100%;
                 border-collapse: collapse;
-                margin: 20px 0;
+                margin-top: 20px;
             }
 
             th,
             td {
                 border: 1px solid #dddddd;
                 text-align: left;
-                padding: 10px;
+                padding: 12px;
             }
 
             th {
@@ -41,11 +81,6 @@
 
             tr:nth-child(even) {
                 background-color: #f9f9f9;
-            }
-
-            a {
-                text-decoration: none;
-                color: #0070c9;
             }
 
             .filter-container {
@@ -59,14 +94,17 @@
                 margin-left: 10px;
             }
 
-            #clickButton {
-                padding: 5px 15px;
-                background-color: #0070c9;
-                color: #fff;
-                border: none;
-                cursor: pointer;
-                font-size: 12px;
-                margin-left: 10px;
+            #statistics {
+                margin-top: 20px;
+            }
+
+            ul {
+                list-style: none;
+                padding: 0;
+            }
+
+            li {
+                margin-bottom: 8px;
             }
         </style>
     </head>
@@ -74,7 +112,6 @@
         <div id="container">
             <h1>Reviews</h1>
             <div id="form-container">
-                <h2>新しいレビューを追加</h2>
                 <form id="reviewForm">
                     <label for="name">ユーザー名:</label>
                     <input type="text" id="name" name="name" required>
@@ -91,6 +128,7 @@
                     <label for="review">レビュー内容:</label>
                     <textarea id="review" name="review" required></textarea>
                     <button type="button" onclick="addReview()">レビューを追加</button>
+                    <button type="button" onclick="updateReview()">レビューを更新</button>
                 </form>
             </div>
             <div class="filter-container">
@@ -146,7 +184,6 @@
             let personas = [];
             personas = JSON.parse(decodeURIComponent('<%- encodeURIComponent(JSON.stringify(personas)) %>'));
 
-            console.log('test')
             function convertStarsToNumber(stars) {
                 if (!stars) {
                     return 0;
@@ -258,7 +295,8 @@
             function addReview() {
                 const name = document.getElementById('name').value;
                 const age = document.getElementById('age').value;
-                const rating = document.getElementById('rating').value;
+                const ratingElement = document.getElementById('rating');
+                const rating = ratingElement.options[ratingElement.selectedIndex].text;
                 const review = document.getElementById('review').value;
 
                 console.log("Form data:", { name, age, rating, review });
@@ -292,6 +330,41 @@
                         console.error('Error:', error);
                     });
             }
+
+            function updateReview() {
+                const selectedId = document.getElementById('rating').value;
+
+                fetch(`/get-review/${selectedId}`, {
+                    method: 'GET',
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        const updatedReview = {
+                            name: data.name,
+                            age: data.age,
+                            rating: convertNumberToStars(data.rating),
+                            review: data.review,
+                        };
+
+                        document.getElementById('name').value = updatedReview.name;
+                        document.getElementById('age').value = updatedReview.age;
+                        document.getElementById('rating').value = updatedReview.rating;
+                        document.getElementById('review').value = updatedReview.review;
+
+                        console.log('Update success:', data);
+
+                        location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Update error:', error);
+                    });
+            }
+
+
+            function convertNumberToStars(number) {
+                return '★'.repeat(number);
+            }
+
         </script>
     </body>
 </html>
