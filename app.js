@@ -106,4 +106,22 @@ app.post("/sort-reviews", (req, res) => {
   });
 });
 
+app.post("/filter-reviews", (req, res) => {
+  const filterSelect =
+    req.body.filter === "all" ? "" : `WHERE rating = ${req.body.filter}`;
+  const sortDirection = req.body.sort === "asc" ? "ASC" : "DESC";
+
+  const sql = `SELECT * FROM personas ${filterSelect} ORDER BY rating ${sortDirection}`;
+
+  con.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      res.status(500).json({ error: "Internal Server Error" });
+    } else {
+      console.log("Filter success. MySQL data filtered.");
+      res.json(results);
+    }
+  });
+});
+
 app.listen(port, () => console.log(`App listening on port ${port}`));
